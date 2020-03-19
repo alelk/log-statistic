@@ -15,6 +15,9 @@ java.sourceCompatibility = JavaVersion.VERSION_13
 
 dependencies {
     
+    /* Fake data generator */
+    implementation("com.github.javafaker:javafaker:1.0.2")
+
     /* Kotlin */
     implementation(kotlin("stdlib-jdk8"))
     implementation(kotlin("reflect"))

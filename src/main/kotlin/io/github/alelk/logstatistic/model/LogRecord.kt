@@ -11,4 +11,10 @@ enum class LogLevel(private val signature: String) {
     fun forSignature(signature: String) = values().find { it.signature == signature }
 }
 
-data class Log(val timestamp: LocalDateTime, val level: LogLevel, val message: String)
+/** Запись лога
+ *
+ * @param timestamp временная метка
+ * @param level уровень
+ * @param message текст сообщения
+ */
+data class LogRecord(val timestamp: LocalDateTime, val level: LogLevel, val message: String)
