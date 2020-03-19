@@ -1,4 +1,4 @@
 package io.github.alelk.logstatistic
 
-fun main() {
+fun main(args: Array<String>) {
 }
