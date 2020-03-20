@@ -1,13 +1,21 @@
 package io.github.alelk.logstatistic
 
-import io.github.alelk.logstatistic.flow.LogRecordFlow
-import java.nio.file.Paths
+import io.github.alelk.logstatistic.flow.logRecordFlow
+import java.io.File
 
 fun main(args: Array<String>) {
 
-    Paths.get("data", "log-1.txt").toFile().bufferedReader().use { reader ->
-        val flow = LogRecordFlow.fromReader(reader)
+    val files =
+            if (args.isNotEmpty()) args.toList().map(::File)
+            else (1..10).map { File("data/log-$it.txt") }
+
+    val readers = files.map { it.bufferedReader() }
+
+    try {
+        val flow = readers.logRecordFlow()
 
         flow.blockingForEach { println(it) }
+    } finally {
+        readers.forEach { it.close() }
     }
 }

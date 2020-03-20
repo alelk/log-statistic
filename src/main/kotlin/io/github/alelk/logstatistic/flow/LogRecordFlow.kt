@@ -2,6 +2,7 @@ package io.github.alelk.logstatistic.flow
 
 import io.github.alelk.logstatistic.model.LogLevel
 import io.github.alelk.logstatistic.model.LogRecord
+import io.reactivex.Emitter
 import io.reactivex.Flowable
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
@@ -9,30 +10,38 @@ import java.io.BufferedReader
 import java.time.LocalDateTime
 import java.util.concurrent.Callable
 
-object LogRecordFlow {
 
-    /** Создает реактивный поток записей лог-файл из заданного [BufferedReader]
-     *
-     * Строки из [BufferedReader] читаются по одной только по мере истощения потока, а не все сразу,
-     * что позволит обрабатывать лог-файлы произвольного размера
-     *
-     *  @param r входной поток из лог-файла
-     */
-    fun fromReader(r: BufferedReader) =
-            Flowable.generate(
-                            Callable {},
-                            BiFunction { _, emitter: io.reactivex.Emitter<LogRecord> ->
-                                try {
-                                    val line = r.readLine()
-                                    if (line != null)
-                                        emitter.onNext(line.parseLogRecord())
-                                    else emitter.onComplete()
-                                } catch (e: Exception) {
-                                    emitter.onError(e)
-                                }
-                            })
-                    .observeOn(Schedulers.io(), false, 1)
-}
+/** Создает реактивный поток записей лог-файл из заданного [BufferedReader]
+ *
+ * Строки из [BufferedReader] читаются по одной только по мере истощения потока, а не все сразу,
+ * что позволит обрабатывать лог-файлы произвольного размера
+ */
+fun BufferedReader.logRecordFlow() =
+        Flowable.generate(
+                        Callable {},
+                        BiFunction { _, emitter: Emitter<LogRecord> ->
+                            try {
+                                val line = this.readLine()
+                                if (line != null)
+                                    emitter.onNext(line.parseLogRecord())
+                                else emitter.onComplete()
+                            } catch (e: Exception) {
+                                emitter.onError(e)
+                            }
+                        })
+                .observeOn(Schedulers.io(), false, 1)
+
+/** Создает реактивный поток упорядоченных по времени записей лога из списка других упорядоченных реактивных потоков */
+fun List<BufferedReader>.logRecordFlow(): Flowable<LogRecord> =
+        when {
+            this.isEmpty() -> Flowable.empty()
+            this.size == 1 -> this.first().logRecordFlow()
+            else -> this
+                    .map { it.logRecordFlow() }
+                    .reduce { acc: Flowable<LogRecord>, f: Flowable<LogRecord> ->
+                        acc.compose(mergeLogRecordFlows(f))
+                    }
+        }
 
 /** Регулярное выражение записи лога */
 val logRecordRegex = """^([\d-T:.]+)\s+(\w+)\s+(.*)$""".toRegex()
