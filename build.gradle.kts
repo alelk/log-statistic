@@ -14,9 +14,11 @@ plugins {
 java.sourceCompatibility = JavaVersion.VERSION_13
 
 dependencies {
-    
     /* Fake data generator */
     implementation("com.github.javafaker:javafaker:1.0.2")
+
+    /* Reactive Streams */
+    implementation("io.reactivex.rxjava2:rxkotlin:2.4.0")
 
     /* Kotlin */
     implementation(kotlin("stdlib-jdk8"))

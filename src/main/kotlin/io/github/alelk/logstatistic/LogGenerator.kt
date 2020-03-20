@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import kotlin.random.Random
 
-/** Генератор записей логирования */
+/** Генератор записей логирования (для тестов) */
 object LogGenerator {
     private val faker by lazy { Faker() }
 
@@ -23,8 +23,7 @@ object LogGenerator {
 }
 
 /** Преобразовать LogRecord в строку лог-файла */
-fun LogRecord.toFileStr() = "${this.timestamp} ${this.level} ${this.message}"
-
+fun LogRecord.toFileStr() = "${this.timestamp} ${this.level.signature} ${this.message}"
 
 fun main(args: Array<String>) {
 
@@ -45,7 +44,7 @@ fun main(args: Array<String>) {
     fun randomFileWriter() = Random.nextInt(fileWriters.size - 1).let { fileWriters[it] }
 
     try {
-        (0..countRecords).fold(LocalDateTime.now()) { startTs, n ->
+        (0..countRecords).fold(LocalDateTime.now()) { startTs, _ ->
             val nextLogRecord = LogGenerator.nextForTimestamp(startTs).toFileStr()
             val (file, fileWriter) = randomFileWriter()
             println("[${file.name}]: $nextLogRecord")

@@ -2,13 +2,18 @@ package io.github.alelk.logstatistic.model
 
 import java.time.LocalDateTime
 
-enum class LogLevel(private val signature: String) {
-    DEBUG("debug"),
-    INFO("info"),
-    WARN("warn"),
-    ERROR("error");
+/** Уровень логировани
+ * @param signature обозначение уровня в лог-файле
+ */
+enum class LogLevel(val signature: String) {
+    DEBUG("DEBUG"),
+    INFO("INFO"),
+    WARN("WARNING"),
+    ERROR("ERROR");
 
-    fun forSignature(signature: String) = values().find { it.signature == signature }
+    companion object {
+        fun forSignature(signature: String) = values().find { it.signature == signature }
+    }
 }
 
 /** Запись лога
