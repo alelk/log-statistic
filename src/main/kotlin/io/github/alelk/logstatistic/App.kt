@@ -2,6 +2,7 @@ package io.github.alelk.logstatistic
 
 import io.github.alelk.logstatistic.flow.logRecordFlow
 import java.io.File
+import java.util.concurrent.Callable
 
 fun main(args: Array<String>) {
 
@@ -13,6 +14,8 @@ fun main(args: Array<String>) {
 
     try {
         val flow = readers.logRecordFlow()
+
+
 
         flow.blockingForEach { println(it) }
     } finally {
