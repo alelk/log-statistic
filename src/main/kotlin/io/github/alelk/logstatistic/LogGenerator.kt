@@ -18,7 +18,7 @@ object LogGenerator {
     fun nextForTimestamp(ts: LocalDateTime) =
             LogRecord(
                     ts,
-                    Random.nextInt(3).let { LogLevel.values()[it] },
+                    Random.nextInt(4).let { LogLevel.values()[it] },
                     faker.lorem().sentence(Random.nextInt(5, 20)))
 }
 
@@ -50,8 +50,8 @@ fun main(args: Array<String>) {
             println("[${file.name}]: $nextLogRecord")
             fileWriter.write("$nextLogRecord\n")
 
-            // следующий лог через случайный промежуток времени [0 секунд - 5 минут]
-            startTs.plus(Random.nextLong(5 * 60 * 1000), ChronoUnit.MICROS)
+            // следующий лог через случайный промежуток времени [0 секунд - 1 минута]
+            startTs.plus(Random.nextLong(1 * 60 * 1000), ChronoUnit.MILLIS)
         }
     } finally {
         fileWriters.forEach { it.second.close() } // освободить ресурсы

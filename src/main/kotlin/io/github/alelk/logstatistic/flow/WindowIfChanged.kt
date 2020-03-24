@@ -6,6 +6,16 @@ import io.reactivex.FlowableTransformer
 import io.reactivex.functions.BiFunction
 import java.util.concurrent.Callable
 
+/** Трансформер, работающий наподобие groupBy, но не пробегающий по всему потоку целиком.
+ *
+ * @param keySelector признак окна - когда пизнак меняется, начинается новое окно
+ */
+// todo: было бы хорошо отладить этот трансформер - разбивать входящий поток на окна по условию, затем для каждого
+//  окна считать статистику. Это позвлолило бы обрабатывать бесконечные потоки логов.
+//  Но за нехваткой времени, решил использовать reduce для сбора статистики - см файл LogStatistic - данный способ
+//  сворачивает поток в единственное значение. Но в этом есть и преимущества - мы не храним все объекты за последний
+//  промежуток времени, а храним только статистический результат
+@Deprecated("нужно отладить")
 fun <A, B> windowIfChanged(keySelector: (A) -> B) = FlowableTransformer<A, List<A>> { f ->
     val iterator = f.blockingIterable(1).iterator()
     Flowable.generate(
@@ -34,5 +44,5 @@ fun <A, B> windowIfChanged(keySelector: (A) -> B) = FlowableTransformer<A, List<
 
 fun main() {
     val v: Flowable<Int> = Flowable.fromIterable((1..20).toList())
-    v.compose(windowIfChanged<Int, Int> { it / 3 }).blockingForEach(::println)
+    v.compose(windowIfChanged<Int, Int> { it / 3 }).blockingForEach(::println) // test
 }
