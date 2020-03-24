@@ -5,7 +5,6 @@ import io.github.alelk.logstatistic.model.LogRecord
 import io.reactivex.Emitter
 import io.reactivex.Flowable
 import io.reactivex.functions.BiFunction
-import io.reactivex.schedulers.Schedulers
 import java.io.BufferedReader
 import java.time.LocalDateTime
 import java.util.concurrent.Callable
@@ -29,7 +28,6 @@ fun BufferedReader.logRecordFlow() =
                                 emitter.onError(e)
                             }
                         })
-                .observeOn(Schedulers.io(), false, 1)
 
 /** Создает реактивный поток упорядоченных по времени записей лога из списка других упорядоченных реактивных потоков */
 fun List<BufferedReader>.logRecordFlow(): Flowable<LogRecord> =
